@@ -1,0 +1,65 @@
+﻿@model IEnumerable<StoreApp.Models.Item>
+@{
+    ViewData["Title"] = "Goods";
+}
+
+
+<div class="text-center">
+    <h1>@ViewData["Title"]</h1>
+</div>
+
+@*<div class="float-right">
+    <div class="row mb-2">
+        <form method="POST">
+            <input type="submit" class="mr-2" asp-page-handler="FromCheapToExpansive" value="Від дешевих до дорогих" />
+            <input type="submit" class="mr-2" asp-page-handler="FromExpansiveToCheap" value="Від дорогих до дешевих" />
+            <input type="submit" class="mr-2" asp-page-handler="Reset" value="Скинути" />
+        </form>
+    </div>
+        <div class="row mb-2">
+            <form method="POST">
+                <label>Ціна</label>
+                <input type="text" class="mr-2" name="from" value="@ViewBag.FromValueText" />
+                -
+                <input type="text" class="mr-2" name="to" value="@ViewBag.ToValueText" />
+                <input type="submit" class="mr-2" asp-page-handler="Filter" value="OK" />
+            </form>
+        </div>
+    </div>*@
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">Price</th>
+            <th scope="col">Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Item item in Model)
+        {
+            <tr>
+                <th scope="row">@item.Id</th>
+                <td>@item.Title</td>
+                <td>@item.Description</td>
+                <td>@item.Price</td>
+                <td>
+                    <form method="post">
+                            <a href="~/Home/Details/@item.Id" class="btn btn-info">More</a>
+                            <a href="~/Home/Buy/@item.Id" class="btn btn-success">Buy</a>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>Кількість товарів: @Model.Count()</p>
+
+<style>
+    .table td, th {
+        text-align: center;
+    } 
+</style>
