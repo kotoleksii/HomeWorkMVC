@@ -8,4 +8,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\pages\staticpage.html" />
+  </ItemGroup>
+
 </Project>

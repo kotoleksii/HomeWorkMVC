@@ -1,13 +1,16 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using StoreApp.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,7 +28,7 @@ namespace StoreApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connection = Configuration.GetConnectionString("DefaultConnection");       
+            string connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<StoreContext>(options => options.UseSqlServer(connection));
             services.AddControllersWithViews();
         }
@@ -33,6 +36,20 @@ namespace StoreApp
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // 3. Свій стан середи
+
+            //app.Run(async (context) =>
+            //{
+            //    if (env.IsEnvironment("Test"))
+            //    {
+            //        await context.Response.WriteAsync("Test STATUS");
+            //    }
+            //    else
+            //    {
+            //        await context.Response.WriteAsync("Development STATUS");
+            //    }
+            //});
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -44,6 +61,13 @@ namespace StoreApp
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+
+            // 4. Використання статичних файлів
+            DefaultFilesOptions options = new DefaultFilesOptions();
+            options.DefaultFileNames.Clear();
+            options.DefaultFileNames.Add("pages/staticpage.html");
+            app.UseDefaultFiles(options);
+
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -56,6 +80,12 @@ namespace StoreApp
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            // 1. Створити свої компоненти middleware 
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseMiddleware<AuthenticationMiddleware>();
+            app.UseMiddleware<RoutingMiddleware>();
+
         }
     }
 }
