@@ -8,24 +8,18 @@
     <h1>@ViewData["Title"]</h1>
 </div>
 
-@*<div class="float-right">
+<div class="float-right">
     <div class="row mb-2">
-        <form method="POST">
-            <input type="submit" class="mr-2" asp-page-handler="FromCheapToExpansive" value="Від дешевих до дорогих" />
-            <input type="submit" class="mr-2" asp-page-handler="FromExpansiveToCheap" value="Від дорогих до дешевих" />
-            <input type="submit" class="mr-2" asp-page-handler="Reset" value="Скинути" />
-        </form>
+        @using (Html.BeginForm("Goods", "Home", FormMethod.Post))
+        {
+            @Html.Label("Ціна")
+            <input type="text" class="mr-2" name="from" value="@ViewBag.FromValueText" />
+            <input type="text" class="mr-2" name="to" value="@ViewBag.ToValueText" />
+            <input type="submit" class="mr-2" value="OK" />
+        }
     </div>
-        <div class="row mb-2">
-            <form method="POST">
-                <label>Ціна</label>
-                <input type="text" class="mr-2" name="from" value="@ViewBag.FromValueText" />
-                -
-                <input type="text" class="mr-2" name="to" value="@ViewBag.ToValueText" />
-                <input type="submit" class="mr-2" asp-page-handler="Filter" value="OK" />
-            </form>
-        </div>
-    </div>*@
+</div>
+
 
 <table class="table table-hover">
     <thead>
@@ -46,20 +40,21 @@
                 <td>@item.Description</td>
                 <td>@item.Price</td>
                 <td>
-                    <form method="post">
-                            <a href="~/Home/Details/@item.Id" class="btn btn-info">More</a>
-                            <a href="~/Home/Buy/@item.Id" class="btn btn-success">Buy</a>
-                    </form>
+                    @using (Html.BeginForm("Goods", "Home", FormMethod.Post))
+                    {
+                        @Html.ActionLink("More", "Details", "Home", new { id = item.Id }, new { @class = "btn btn-info mx-2" })
+                        @Html.ActionLink("Buy", "Buy", "Home", new { id = item.Id }, new { @class = "btn btn-success" })
+                    }
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<p>Кількість товарів: @Model.Count()</p>
+@Html.Label("Кількість товарів: " + @Model.Count())
 
 <style>
     .table td, th {
         text-align: center;
-    } 
+    }
 </style>

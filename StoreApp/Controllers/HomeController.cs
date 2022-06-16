@@ -53,6 +53,19 @@ namespace StoreApp.Controllers
             return View(db.Items.ToList());
         }
 
+        [HttpPost]
+        public IActionResult Goods(int from, int to)
+        {
+            if (to != 0)
+            {
+                return View(db.Items.Where(p => p.Price >= from && p.Price <= to).ToList());
+            }
+            else
+            {
+                return View(db.Items.Where(p => p.Price <= from).ToList());
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> Details(int? id)
         {
@@ -73,7 +86,8 @@ namespace StoreApp.Controllers
         public IActionResult Buy(int? id)
         {
             if (id == null) return RedirectToAction("Index");
-            ViewBag.ItemId = id;
+
+            ViewData["ItemId"] = id;
             ViewBag.ItemTitle = GetItemTitleByID(id);
 
             return View();
@@ -89,6 +103,16 @@ namespace StoreApp.Controllers
             var itemTitle = GetItemTitleByID(order.ItemId);
 
             TempData["message"] = $"Thanks {order.FullName} for purchasing {itemTitle}!";
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public IActionResult SignUp(User user)
+        {
+            db.Users.Add(user);
+
+            db.SaveChanges();
 
             return RedirectToAction("Index", "Home");
         }

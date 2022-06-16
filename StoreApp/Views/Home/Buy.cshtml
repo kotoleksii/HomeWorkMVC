@@ -1,4 +1,6 @@
-﻿@{
+﻿@model StoreApp.Models.Order
+
+@{
     ViewData["Title"] = "Оформлення покупки";
 }
 
@@ -11,25 +13,26 @@
                     <div class="card-body p-5">
                         <h2 class="text-uppercase text-center mb-0">@ViewData["Title"]</h2>
                         <p class="text-center mt-0">(@ViewBag.ItemTitle)</p>
-                        <form method="post" class="form-horizontal" role="form">
-                            <input type="hidden" value="@ViewBag.ItemId" name="ItemId" />
+                        @using (Html.BeginForm("Buy", "Home", FormMethod.Post))
+                        {
+                            @Html.Hidden("ItemId", @ViewData["ItemId"])
 
                             <div class="form-outline mb-2">
-                                <input type="text" name="FullName" class="form-control form-control-lg" placeholder="Ім`я та Прізвище" />
+                                @Html.TextBoxFor(m => m.FullName, new { placeholder = "Ім`я та Прізвище", @class = "form-control form-control-lg" })
                             </div>
 
                             <div class="form-outline mb-2">
-                                <input type="tel" name="Phone" class="form-control form-control-lg" placeholder="Мобільний" />
+                                @Html.TextBoxFor(m => m.Phone, new { placeholder = "Мобільний", @class = "form-control form-control-lg" })
                             </div>
 
                             <div class="form-outline mb-2">
-                                <input type="text" name="Address" class="form-control form-control-lg" placeholder="Адреса доставки" />
+                                @Html.TextBoxFor(m => m.Address, new { placeholder = "Адреса доставки", @class = "form-control form-control-lg" })
                             </div>
 
                             <div class="d-flex justify-content-center">
                                 <input type="submit" class="btn btn-success btn-block btn-lg text-body" value="Підтвердити" />
                             </div>
-                        </form>
+                        }
                     </div>
                 </div>
             </div>

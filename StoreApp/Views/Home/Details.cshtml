@@ -1,15 +1,20 @@
-﻿@{
+﻿@model StoreApp.Models.Item
+
+@{
     ViewData["Title"] = "Details";
 }
 
 <div class="row justify-content-center">
-        <div class="card mb-3 w-50">
-            <div class="card-header bg-transparent text-center">GoodID: @Model.Id</div>
-            <div class="card-body">
-                <h5 class="card-title text-center">@Model.Title</h5>
-                <p class="card-text text-center">@Model.Description</p>
-            </div>
-            <div class="card-footer bg-transparent text-center">@Model.Price$</div>
-            <a href="~/Home/Goods" class="btn btn-primary">Back</a>
+    <div class="card mb-3 w-50">
+        <div class="card-header bg-transparent text-center">
+            @Html.Label("GoodID: ")
+            @Html.DisplayFor(m => m.Id)
         </div>
+        <div class="card-body">
+            <h5 class="card-title text-center">@Html.DisplayFor(m => m.Title)</h5>
+            <p class="card-text text-center">@Html.DisplayFor(m => m.Description)</p>
+        </div>
+        <div class="card-footer bg-transparent text-center">@Html.DisplayFor(m => m.Price)$</div>
+        @Html.ActionLink("Back", "Goods", "Home", "", new { @class = "btn btn-primary" })
     </div>
+</div>

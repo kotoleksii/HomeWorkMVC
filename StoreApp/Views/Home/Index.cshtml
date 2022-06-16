@@ -4,7 +4,7 @@
 
 <div class="text-center">
     <h1>Welcome in @ViewBag.AppName</h1>
-    <a class="btn btn-primary" href="~/Home/Goods" role="button">Go To Goods</a>
+    <a class = "btn btn-primary" asp-controller="Home" asp-action="Goods">Go To Goods</a>
 </div>
 
 @if (TempData["message"] != null)
