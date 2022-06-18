@@ -71,9 +71,9 @@ namespace StoreApp
             });
 
             // 1. Створити свої компоненти middleware 
-            app.UseMiddleware<ErrorHandlingMiddleware>();
-            app.UseMiddleware<AuthenticationMiddleware>();
-            app.UseMiddleware<RoutingMiddleware>();
+            //app.UseMiddleware<ErrorHandlingMiddleware>();
+            //app.UseMiddleware<AuthenticationMiddleware>();
+            //app.UseMiddleware<RoutingMiddleware>();
 
         }
     }

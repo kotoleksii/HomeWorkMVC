@@ -1,34 +1,45 @@
-﻿@model IEnumerable<StoreApp.Models.Item>
-@{
-    ViewData["Title"] = "Goods";
-}
+﻿@model PaginatedList<StoreApp.Models.Item>
 
+
+@{
+    ViewData["Title"] = "Товари";
+}
 
 <div class="text-center">
     <h1>@ViewData["Title"]</h1>
 </div>
 
-<div class="float-right">
-    <div class="row mb-2">
-        @using (Html.BeginForm("Goods", "Home", FormMethod.Post))
-        {
-            @Html.Label("Ціна")
-            <input type="text" class="mr-2" name="from" value="@ViewBag.FromValueText" />
-            <input type="text" class="mr-2" name="to" value="@ViewBag.ToValueText" />
-            <input type="submit" class="mr-2" value="OK" />
-        }
+<div class="row align-items-center">
+    <div class="col">
+        <a class="btn btn-success" asp-controller="Home" asp-action="Create">Додати</a>
+    </div>
+    <div class="col">
+        <div class="float-right">
+            <div class="row mb-2">
+                @using (Html.BeginForm())
+                {
+                    <p>
+                        <div class="input-group mb-3">
+                            @Html.TextBox("SearchString", null, new { @class = "form-control", @placeholder = "Введіть запит" })
+                            <div class="input-group-append">
+                                <input class="btn btn-outline-secondary" type="submit" value="Пошук" />
+                            </div>
+                        </div>
+                    </p>
+                }
+            </div>
+        </div>
     </div>
 </div>
-
 
 <table class="table table-hover">
     <thead>
         <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Title</th>
-            <th scope="col">Description</th>
-            <th scope="col">Price</th>
-            <th scope="col">Details</th>
+            <th scope="col">@Html.ActionLink("ID", "Goods", new { sortOrder = ViewBag.IdSortParm })</th>
+            <th scope="col">@Html.ActionLink("Назва", "Goods", new { sortOrder = ViewBag.TitleSortParm })</th>
+            <th scope="col">Опис</th>
+            <th scope="col">@Html.ActionLink("Ціна", "Goods", new { sortOrder = ViewBag.PriceSortParm })</th>
+            <th scope="col">Дії</th>
         </tr>
     </thead>
     <tbody>
@@ -42,16 +53,54 @@
                 <td>
                     @using (Html.BeginForm("Goods", "Home", FormMethod.Post))
                     {
-                        @Html.ActionLink("More", "Details", "Home", new { id = item.Id }, new { @class = "btn btn-info mx-2" })
-                        @Html.ActionLink("Buy", "Buy", "Home", new { id = item.Id }, new { @class = "btn btn-success" })
+                        <div class="d-grid gap-2 d-md-block">
+                            @Html.ActionLink("Деталі", "Details", "Home", new { id = item.Id }, new { @class = "btn btn-info" })
+                            @Html.ActionLink("Редагувати", "Edit", "Home", new { id = item.Id }, new { @class = "btn btn-warning" })
+                            @Html.ActionLink("Видалити", "Delete", "Home", new { id = item.Id }, new { @class = "btn btn-danger" })
+                            @Html.ActionLink("Купити", "Buy", "Home", new { id = item.Id }, new { @class = "btn btn-primary" })
+                        </div>
                     }
                 </td>
             </tr>
         }
     </tbody>
 </table>
+<br />
 
-<item count="@Model.Count()"></item>
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<div class="row align-items-center">
+    <div class="col">
+        <item count="@Model.Count()"></item>
+    </div>
+    <div class="col">
+        <div class="float-right">
+            <div class="row">
+                <div class="col">
+                    <a asp-action="Goods"
+                       asp-route-sortOrder="@ViewData["CurrentSort"]"
+                       asp-route-pageNumber="@(Model.PageIndex - 1)"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                       class="btn btn-default @prevDisabled">
+                        Назад
+                    </a>
+                </div>
+                <div class="col">
+                    <a asp-action="Goods"
+                       asp-route-sortOrder="@ViewData["CurrentSort"]"
+                       asp-route-pageNumber="@(Model.PageIndex + 1)"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                       class="btn btn-default @nextDisabled">
+                        Вперед
+                    </a>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
 
 <style>
     .table td, th {

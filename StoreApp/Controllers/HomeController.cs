@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using StoreApp.Models;
-using StoreApp.Services;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,32 +35,132 @@ namespace StoreApp.Controllers
             return View();
         }
 
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Item item)
+        {
+            db.Items.Add(item);
+            await db.SaveChangesAsync();
+            return RedirectToAction("Goods");
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id != null)
+            {
+                db.ChangeTracker.Clear();
+                Item item = await db.Items.FirstOrDefaultAsync(p => p.Id == id);
+                if (item != null)
+                    return View(item);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Item item)
+        {
+            var entry = db.Items.First(e => e.Id == item.Id);
+
+            db.Entry(entry).CurrentValues.SetValues(item);
+            db.SaveChangesAsync();
+            return RedirectToAction("Goods");
+        }
+
+        [HttpGet]
+        [ActionName("Delete")]
+        public async Task<IActionResult> ConfirmDelete(int? id)
+        {
+            if (id != null)
+            {
+                Item item = await db.Items.FirstOrDefaultAsync(p => p.Id == id);
+                if (item != null)
+                    return View(item);
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id != null)
+            {
+                Item item = await db.Items.FirstOrDefaultAsync(p => p.Id == id);
+                if (item != null)
+                {
+                    db.Items.Remove(item);
+                    await db.SaveChangesAsync();
+
+
+                    return RedirectToAction("Goods");
+                }
+            }
+            return NotFound();
+        }
+
         [HttpPost]
         public IActionResult IncrementCount()
         {
             return View(db.Items.OrderBy(p => p.Price).ToList());
         }
 
-        [HttpGet]
-        public IActionResult Goods()
+        public async Task<IActionResult> Goods(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
-            ViewBag.FromValueText = FromValueText;
-            ViewBag.ToValueText = ToValueText;
+            ViewData["CurrentSort"] = sortOrder;
+            ViewBag.IdSortParm = String.IsNullOrEmpty(sortOrder) ? "Id" : "";
+            ViewBag.TitleSortParm = sortOrder == "Title" ? "title_desc" : "Title";
+            ViewBag.PriceSortParm = sortOrder == "Price" ? "price_desc" : "Price";
 
-            return View(db.Items.ToList());
-        }
+            int pageSize = 3;
 
-        [HttpPost]
-        public IActionResult Goods(int from, int to)
-        {
-            if (to != 0)
+            if (searchString != null)
             {
-                return View(db.Items.Where(p => p.Price >= from && p.Price <= to).ToList());
+                pageNumber = 1;
             }
             else
             {
-                return View(db.Items.Where(p => p.Price <= from).ToList());
+                searchString = currentFilter;
             }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var items = from i in db.Items
+                        select i;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                items = items.Where(i => i.Title.Contains(searchString)
+                                       || i.Description.Contains(searchString)
+                                       || i.Id.ToString().Contains(searchString)
+                                       || i.Price.ToString().Contains(searchString));
+            }
+
+            switch (sortOrder)
+            {
+                case "Id":
+                    items = items.OrderBy(s => s.Id);
+                    break;
+                case "Price":
+                    items = items.OrderBy(s => s.Price);
+                    break;
+                case "price_desc":
+                    items = items.OrderByDescending(s => s.Price);
+                    break;
+                case "Title":
+                    items = items.OrderBy(s => s.Title);
+                    break;
+                case "title_desc":
+                    items = items.OrderByDescending(s => s.Title);
+                    break;
+                default:
+                    items = items.OrderByDescending(s => s.Id);
+                    break;
+            }
+
+            return View(await PaginatedList<Item>.CreateAsync(items.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         [HttpGet]
